@@ -18,10 +18,22 @@ namespace PDRS1.NPCs.Customers
 {
     public sealed class PdrCustomerJay : NPC
     {
-        public override bool IsPhysical => true;
+        #region Constants
+        
+        private static readonly Vector3 MeetingSpot = new Vector3(-78.67f, -0.60f, -60.95f);
+        private static readonly Vector3 SpawnPosition = new Vector3(-80.0f, -0.60f, -65.0f);
+        
+        #endregion
 
-        [SaveableField("JayData")] private JayData _data = new JayData();
+        #region Saveable Data
+        
+        [SaveableField("JayData")]
+        private JayData _data = new JayData();
+        
+        #endregion
 
+        #region Constructor
+        
         public PdrCustomerJay() : base(
             id: "pdr_customer_jay",
             firstName: "Jay",
@@ -29,19 +41,17 @@ namespace PDRS1.NPCs.Customers
             icon: null)
         {
         }
+        
+        #endregion
+
+        #region NPC Overrides
+        
+        public override bool IsPhysical => true;
 
         protected override void ConfigurePrefab(NPCPrefabBuilder builder)
         {
             MelonLogger.Msg("Configuring prefab for Jay Walker");
-
-            var manorParking = ParkingLotRegistry.Get<ManorParking>();
-            var docksWarehouse = Building.Get<DocksShippingContainer>();
-
-            // Meeting spot - at the Docks
-            Vector3 meetingSpot = new Vector3(-78.67f, -0.60f, -60.95f);
-            // Spawn position - also at Docks
-            Vector3 spawnPos = new Vector3(-80.0f, -0.60f, -65.0f);
-
+            
             builder.WithIdentity("pdr_customer_jay", "Jay", "Walker")
                 .WithAppearanceDefaults(av =>
                 {
@@ -65,7 +75,7 @@ namespace PDRS1.NPCs.Customers
                     av.WithBodyLayer("Avatar/Layers/Bottom/Jeans", new Color(0.15f, 0.2f, 0.3f));
                     av.WithAccessoryLayer("Avatar/Accessories/Feet/Sneakers/Sneakers", Color.white);
                 })
-                .WithSpawnPosition(spawnPos)
+                .WithSpawnPosition(SpawnPosition)
                 .EnsureCustomer()
                 .WithCustomerDefaults(cd =>
                 {
@@ -88,8 +98,6 @@ namespace PDRS1.NPCs.Customers
                 });
         }
 
-
-
         protected override void OnCreated()
         {
             try
@@ -110,8 +118,6 @@ namespace PDRS1.NPCs.Customers
                 Aggressiveness = 3f;
                 Region = Region.Docks;
                 
-                Schedule.Enable();
-                
                 MelonLogger.Msg("[PDRS1] Jay Walker created successfully");
             }
             catch (Exception ex)
@@ -121,17 +127,70 @@ namespace PDRS1.NPCs.Customers
             }
         }
 
+        protected override void OnResponseLoaded(Response response)
+        {
+            MelonLogger.Msg($"[PDRS1] OnResponseLoaded: {response.Label}");
+
+            switch (response.Label)
+            {
+                case "INTRO_0":
+                case "INTRO_1":
+                    response.OnTriggered = ProgressIntro;
+                    break;
+                case "ACCEPT_DEAL":
+                    response.OnTriggered = AcceptDeal;
+                    break;
+                case "DECLINE_DEAL":
+                    response.OnTriggered = DeclineDeal;
+                    break;
+            }
+        }
+        
+        #endregion
+
+        #region Public Methods
+        
+        /// <summary>
+        /// Manually triggers a message from Jay (for testing purposes)
+        /// </summary>
         public void TriggerManualMessage()
         {
             MelonLogger.Msg("[PDRS1] TriggerManualMessage called");
             SendDailyMessage();
         }
+        
+        #endregion
 
+        #region Event Handlers
+        
         private void OnDayPassHandler()
         {
             MelonLogger.Msg("[PDRS1] OnDayPassHandler triggered");
             SendDailyMessage();
         }
+
+        private void OnDealCompleted()
+        {
+            MelonLogger.Msg("[PDRS1] ========================================");
+            MelonLogger.Msg("[PDRS1] DEAL COMPLETED!");
+            MelonLogger.Msg("[PDRS1] ========================================");
+
+            CustomerLoyaltySystem.RegisterPurchase("pdr_customer_jay");
+            var tier = CustomerLoyaltySystem.GetTier("pdr_customer_jay");
+            
+            MelonLogger.Msg($"[PDRS1] Jay's loyalty tier: {tier}");
+            SendTextMessage($"Thanks bro. That {_data.CurrentDrug} is fire 🔥");
+
+            CustomerIntentCache.ClearIntent("pdr_customer_jay");
+            _data.CurrentDrug = string.Empty;
+            
+            // Return Jay to spawn position after deal
+            Goto(SpawnPosition);
+        }
+        
+        #endregion
+
+        #region Messaging Logic
         
         private void SendDailyMessage()
         {
@@ -198,26 +257,11 @@ namespace PDRS1.NPCs.Customers
             
             MelonLogger.Msg($"[PDRS1] Jay asking for {drug}");
         }
+        
+        #endregion
 
-        protected override void OnResponseLoaded(Response response)
-        {
-            MelonLogger.Msg($"[PDRS1] OnResponseLoaded: {response.Label}");
-
-            switch (response.Label)
-            {
-                case "INTRO_0":
-                case "INTRO_1":
-                    response.OnTriggered = ProgressIntro;
-                    break;
-                case "ACCEPT_DEAL":
-                    response.OnTriggered = AcceptDeal;
-                    break;
-                case "DECLINE_DEAL":
-                    response.OnTriggered = DeclineDeal;
-                    break;
-            }
-        }
-
+        #region Response Handlers
+        
         private void ProgressIntro()
         {
             MelonLogger.Msg("[PDRS1] Player responded to intro");
@@ -231,11 +275,10 @@ namespace PDRS1.NPCs.Customers
 
             SendTextMessage("Bet. I'm heading there now.");
             _data.WaitingForResponse = false;
-            
-            Vector3 meetingSpot = new Vector3(-78.67f, -0.60f, -60.95f);
-            Goto(meetingSpot);
-            // Jay will walk to the meeting spot via his schedule
-            // Player needs to go meet him there and interact in person
+
+            // Make Jay walk to the meeting spot at the Docks
+            MelonLogger.Msg($"[PDRS1] Sending Jay to meeting spot: {MeetingSpot}");
+            Goto(MeetingSpot);
         }
 
         private void DeclineDeal()
@@ -246,23 +289,11 @@ namespace PDRS1.NPCs.Customers
             CustomerIntentCache.ClearIntent("pdr_customer_jay");
             _data.CurrentDrug = string.Empty;
         }
+        
+        #endregion
 
-        private void OnDealCompleted()
-        {
-            MelonLogger.Msg("[PDRS1] ========================================");
-            MelonLogger.Msg("[PDRS1] DEAL COMPLETED!");
-            MelonLogger.Msg("[PDRS1] ========================================");
-
-            CustomerLoyaltySystem.RegisterPurchase("pdr_customer_jay");
-            var tier = CustomerLoyaltySystem.GetTier("pdr_customer_jay");
-            
-            MelonLogger.Msg($"[PDRS1] Jay's loyalty tier: {tier}");
-            SendTextMessage($"Thanks bro. That {_data.CurrentDrug} is fire 🔥");
-
-            CustomerIntentCache.ClearIntent("pdr_customer_jay");
-            _data.CurrentDrug = string.Empty;
-        }
-
+        #region Nested Classes
+        
         [Serializable]
         private class JayData
         {
@@ -271,5 +302,7 @@ namespace PDRS1.NPCs.Customers
             public bool WaitingForResponse = false;
             public string CurrentDrug = string.Empty;
         }
+        
+        #endregion
     }
 }

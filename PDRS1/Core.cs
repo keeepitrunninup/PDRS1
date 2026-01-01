@@ -1,12 +1,18 @@
 ﻿using MelonLoader;
 using S1API.Entities;
 using PDRS1.NPCs.Customers;
+using S1API.Map.Buildings;
+using UnityEngine;
 
 [assembly: MelonInfo(typeof(PDRS1.Core), "PDRS1", "1.0.0", "Jack")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace PDRS1
 {
+    /// <summary>
+    /// Main entry point for the PDRS1 mod.
+    /// Responsible for registering NPCs once the game scene is loaded.
+    /// </summary>
     public sealed class Core : MelonMod
     {
         public static Core? Instance { get; private set; }
@@ -21,22 +27,28 @@ namespace PDRS1
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (!sceneName.Contains("Game"))
+            {
                 return;
+            }
 
-            MelonLogger.Msg("[PDRS1] Game scene loaded");
-            RegisterCustomers();
+            RegisterNpcs();
         }
 
         public override void OnUpdate()
         {
-            if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F8))
+            // F8 - Make Jay come to Manor (easy to find location)
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F8))
             {
-                MelonLogger.Msg("[PDRS1] F8 PRESSED");
+                MelonLogger.Msg("[PDRS1] F8 PRESSED - Sending Jay to Manor");
 
                 var jay = NPC.Get<PdrCustomerJay>();
-                if (jay is PdrCustomerJay jayCustomer)
+                if (jay != null)
                 {
-                    jayCustomer.TriggerManualMessage();
+                    // Send Jay to Manor front door (easy location to find him)
+                    Vector3 docksLocation = new Vector3(168.21f, -11f, -67.17f); // Manor entrance
+                    MelonLogger.Msg($"[PDRS1] Sending Jay to Manor entrance: {docksLocation}");
+                    
+                    jay.Goto(docksLocation);
                 }
                 else
                 {
@@ -45,10 +57,10 @@ namespace PDRS1
             }
         }
 
-        private void RegisterCustomers()
+        private static void RegisterNpcs()
         {
-            var jay = NPC.Get<PdrCustomerJay>();
-            MelonLogger.Msg($"[PDRS1] Registered: {(jay != null ? jay.ID : "NULL")}");
+            NPC.Get<PdrCustomerJay>();
+            MelonLogger.Msg("[PDRS1] Customer NPCs registered");
         }
 
         public override void OnApplicationQuit()
