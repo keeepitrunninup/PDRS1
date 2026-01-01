@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    ".NETStandard,Version=v2.1": {
+    "net6.0": {
       "Input/1.0.3": {
         "type": "package",
         "dependencies": {
@@ -9,22 +9,22 @@
           "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
         },
         "compile": {
-          "lib/netstandard2.0/Input.dll": {}
+          "lib/net6.0/Input.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/Input.dll": {}
+          "lib/net6.0/Input.dll": {}
         }
       },
       "LavaGang.MelonLoader/0.7.0": {
         "type": "package",
         "compile": {
-          "lib/net35/MelonLoader.dll": {
-            "related": ".xml"
+          "lib/net6.0/MelonLoader.dll": {
+            "related": ".runtimeconfig.json;.xml"
           }
         },
         "runtime": {
-          "lib/net35/MelonLoader.dll": {
-            "related": ".xml"
+          "lib/net6.0/MelonLoader.dll": {
+            "related": ".runtimeconfig.json;.xml"
           }
         }
       },
@@ -189,9 +189,7 @@
           "System.Runtime.Handles": "4.3.0"
         },
         "compile": {
-          "ref/netstandard1.5/_._": {
-            "related": ".xml"
-          }
+          "ref/netcoreapp1.1/_._": {}
         }
       },
       "System.Runtime.InteropServices.RuntimeInformation/4.3.0": {
@@ -1222,7 +1220,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETStandard,Version=v2.1": [
+    "net6.0": [
       "Input >= 1.0.3",
       "LavaGang.MelonLoader >= 0.7.0"
     ]
@@ -1233,26 +1231,26 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\S1 Mods\\PDRS1\\PDRS1\\PDRS1.csproj",
+      "projectUniqueName": "F:\\Discord Bot\\PDRS1\\PDRS1\\PDRS1.csproj",
       "projectName": "PDRS1",
-      "projectPath": "E:\\S1 Mods\\PDRS1\\PDRS1\\PDRS1.csproj",
+      "projectPath": "F:\\Discord Bot\\PDRS1\\PDRS1\\PDRS1.csproj",
       "packagesPath": "C:\\Users\\dillo\\.nuget\\packages\\",
-      "outputPath": "E:\\S1 Mods\\PDRS1\\PDRS1\\obj\\",
+      "outputPath": "F:\\Discord Bot\\PDRS1\\PDRS1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dillo\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "netstandard2.1"
+        "net6.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "netstandard2.1": {
-          "targetAlias": "netstandard2.1",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "projectReferences": {}
         }
       },
@@ -1269,8 +1267,8 @@
       "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
-      "netstandard2.1": {
-        "targetAlias": "netstandard2.1",
+      "net6.0": {
+        "targetAlias": "net6.0",
         "dependencies": {
           "Input": {
             "target": "Package",
@@ -1292,8 +1290,22 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          }
+        ],
         "frameworkReferences": {
-          "NETStandard.Library": {
+          "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
@@ -1306,20 +1318,10 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'LavaGang.MelonLoader 0.7.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework '.NETStandard,Version=v2.1'. This package may not be fully compatible with your project.",
-      "libraryId": "LavaGang.MelonLoader",
-      "targetGraphs": [
-        ".NETStandard,Version=v2.1"
-      ]
-    },
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'System.Core 3.5.21022.801' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework '.NETStandard,Version=v2.1'. This package may not be fully compatible with your project.",
+      "message": "Package 'System.Core 3.5.21022.801' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
       "libraryId": "System.Core",
       "targetGraphs": [
-        ".NETStandard,Version=v2.1"
+        "net6.0"
       ]
     }
   ]

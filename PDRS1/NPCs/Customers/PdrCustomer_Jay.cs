@@ -52,6 +52,8 @@ namespace PDRS1.NPCs.Customers
         {
             MelonLogger.Msg("Configuring prefab for Jay Walker");
             
+            var docksWarehouse = Building.Get<DocksShippingContainer>();
+            
             builder.WithIdentity("pdr_customer_jay", "Jay", "Walker")
                 .WithAppearanceDefaults(av =>
                 {
@@ -95,6 +97,20 @@ namespace PDRS1.NPCs.Customers
                     r.WithDelta(1.5f)
                         .SetUnlocked(true)
                         .SetUnlockType(NPCRelationship.UnlockType.DirectApproach);
+                })
+                .WithSchedule(plan =>
+                {
+                    // Ensure deal signal exists for customer interactions
+                    plan.EnsureDealSignal();
+                    
+                    // Walk to meeting spot at 10:00 AM
+                    plan.WalkTo(MeetingSpot, 1000, faceDestinationDir: true);
+                    
+                    // Stay at the Docks warehouse from 11:00 AM for 120 minutes
+                    plan.StayInBuilding(docksWarehouse, 1100, 120);
+                    
+                    // Walk back to spawn position at 3:00 PM
+                    plan.WalkTo(SpawnPosition, 1500, faceDestinationDir: true);
                 });
         }
 
@@ -106,7 +122,6 @@ namespace PDRS1.NPCs.Customers
                 Appearance.Build();
                 
                 MelonLogger.Msg("[PDRS1] Jay Walker OnCreated called");
-                
                 TimeManager.OnDayPass += OnDayPassHandler;
                 
                 if (Customer != null)
@@ -117,6 +132,10 @@ namespace PDRS1.NPCs.Customers
                 
                 Aggressiveness = 3f;
                 Region = Region.Docks;
+                
+                // Enable schedule system
+                Schedule.Enable();
+                MelonLogger.Msg("[PDRS1] Schedule enabled");
                 
                 MelonLogger.Msg("[PDRS1] Jay Walker created successfully");
             }

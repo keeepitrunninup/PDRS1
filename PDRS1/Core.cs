@@ -1,7 +1,6 @@
 ﻿using MelonLoader;
 using S1API.Entities;
 using PDRS1.NPCs.Customers;
-using S1API.Map.Buildings;
 using UnityEngine;
 
 [assembly: MelonInfo(typeof(PDRS1.Core), "PDRS1", "1.0.0", "Jack")]
@@ -36,19 +35,16 @@ namespace PDRS1
 
         public override void OnUpdate()
         {
-            // F8 - Make Jay come to Manor (easy to find location)
+            // F8 - Trigger Jay's test message
             if (UnityEngine.Input.GetKeyDown(KeyCode.F8))
             {
-                MelonLogger.Msg("[PDRS1] F8 PRESSED - Sending Jay to Manor");
+                MelonLogger.Msg("[PDRS1] F8 PRESSED - Triggering Jay's test message");
 
                 var jay = NPC.Get<PdrCustomerJay>();
                 if (jay != null)
                 {
-                    // Send Jay to Manor front door (easy location to find him)
-                    Vector3 docksLocation = new Vector3(168.21f, -11f, -67.17f); // Manor entrance
-                    MelonLogger.Msg($"[PDRS1] Sending Jay to Manor entrance: {docksLocation}");
-                    
-                    jay.Goto(docksLocation);
+                    jay.SendTextMessage("Jay Walker created successfully");
+                    MelonLogger.Msg("[PDRS1] Test message triggered");
                 }
                 else
                 {
